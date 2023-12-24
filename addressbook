@@ -1,0 +1,49 @@
+#!/bin/bash
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+address_book="${script_dir}/addressbook.txt"
+
+function new_entry {
+  local name=$1
+  local email=$2
+
+  echo "$name $email" >> "$address_book"
+}
+
+function list_entries {
+  if [ -s "$address_book" ]; then
+    cat "$address_book"
+  else
+    echo "Addressbook empty"
+  fi
+}
+
+function remove_entry {
+  local name=$1
+
+  sed -i "/^$name/d" "$address_book"
+}
+
+function lookup_entry {
+  local name=$1
+
+  grep "^$name" "$address_book" | rev | cut -d' ' -f1 | rev
+}
+
+case $1 in
+  new)
+    new_entry "$2" "$3"
+    ;;
+  list)
+    list_entries
+    ;;
+  remove)
+    remove_entry "$2"
+    ;;
+  lookup)
+    lookup_entry "$2"
+    ;;
+  clear)
+    > "$address_book"
+    ;;
+esac
